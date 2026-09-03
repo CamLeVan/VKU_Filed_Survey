@@ -1,5 +1,5 @@
 // VKU Field Survey Service Worker - Production Cache-First PWA Implementation
-const CACHE_NAME = 'vku-survey-v1';
+const CACHE_NAME = 'vku-survey-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -40,7 +40,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Skip non-GET requests (e.g. POST API requests go directly to network or IndexedDB queue)
+  // Skip non-GET requests
   if (req.method !== 'GET') {
     return;
   }
@@ -62,24 +62,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static Assets & Shell: Cache-First strategy with Network Fallback
+  // Cache-First strategy for all assets & routes with dynamic caching
   event.respondWith(
     caches.match(req).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch background update for cache freshness (Stale-While-Revalidate pattern)
+        // Background refresh (Stale-While-Revalidate)
         fetch(req).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
+          if (networkResponse && networkResponse.ok) {
             caches.open(CACHE_NAME).then((cache) => cache.put(req, networkResponse));
           }
-        }).catch(() => {/* Ignore network error when offline */});
+        }).catch(() => {/* Offline fallback */});
         
         return cachedResponse;
       }
 
-      // Not in cache: fetch from network and dynamically cache valid responses
+      // Not in cache: fetch from network and cache
       return fetch(req)
         .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          if (!networkResponse || (!networkResponse.ok && networkResponse.type !== 'opaque')) {
             return networkResponse;
           }
           const responseToCache = networkResponse.clone();
@@ -89,9 +89,9 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // If HTML request fails, return cached index.html
-          if (req.headers.get('accept')?.includes('text/html')) {
-            return caches.match('/index.html');
+          // If navigation/HTML fails offline, return cached index.html
+          if (req.mode === 'navigate' || req.headers.get('accept')?.includes('text/html')) {
+            return caches.match('/index.html') || caches.match('/');
           }
           return new Response('Offline - Content unavailable', { status: 503, statusText: 'Offline' });
         });
@@ -99,7 +99,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Sync Event Listener for Background Sync API (if supported by browser)
+// Sync Event Listener for Background Sync API
 self.addEventListener('sync', (event) => {
   if (event.tag === 'vku-survey-sync') {
     console.log('[SW] Background Sync triggered:', event.tag);
