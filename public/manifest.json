@@ -1,0 +1,26 @@
+{
+  "short_name": "VKU Survey",
+  "name": "VKU Field Survey - Offline Campus Inspection",
+  "description": "Offline-first PWA & Capacitor campus facility inspection app for VKU students and auditors.",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
+  "scope": "/"
+}
