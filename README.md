@@ -6,6 +6,9 @@
 **Sinh viên thực hiện:** Lê Văn Cảm  
 **Mini-Project #1** (Trọng số: 10%)
 
+🌐 **Live Demo (Cloudflare Pages):** [https://vku-filed-survey.pages.dev](https://vku-filed-survey.pages.dev)  
+💻 **GitHub Repository:** [https://github.com/CamLeVan/VKU_Filed_Survey.git](https://github.com/CamLeVan/VKU_Filed_Survey.git)
+
 ---
 
 ## 📌 Project Overview & Scenario
